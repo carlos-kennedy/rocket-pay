@@ -17,11 +17,12 @@ function setCardType(type) {
   ccIcon.setAttribute("src", `cc-${type}.svg`);
 }
 
+globalThis.setCardType = setCardType;
+
 const securityCode = document.querySelector("#security-code");
 const securityCodePattern = {
   mask: "0000",
 };
-
 const securityCodeMasked = IMask(securityCode, securityCodePattern);
 
 const expirationDate = document.querySelector("#expiration-date");
@@ -63,8 +64,6 @@ const cardNumberPattern = {
   ],
   dispatch: function (appended, dynamicMasked) {
     const number = (dynamicMasked.value + appended).replace(/\D/g, "");
-    // alternative
-    // const foundMask = dynamicMasked.compileMasks.find(({regex}) => number.match(regex))
     const foundMask = dynamicMasked.compiledMasks.find(function (item) {
       return number.match(item.regex);
     });
@@ -74,4 +73,56 @@ const cardNumberPattern = {
 };
 const cardNumberMasked = IMask(cardNumber, cardNumberPattern);
 
-globalThis.setCardType = setCardType;
+const cardHolder = document.querySelector("#card-holder");
+const cardHolderPattern = {
+  mask: /^[a-z A-Z.]{1,30}$/,
+};
+
+const cardHolderMasked = IMask(cardHolder, cardHolderPattern);
+
+const btn = document.querySelector("#btn-add-cc");
+btn.addEventListener("click", () => {});
+
+document.querySelector("form").addEventListener("click", (event) => {
+  event.preventDefault();
+});
+
+cardNumberMasked.on("accept", () => {
+  const cardType = cardNumberMasked.masked.currentMask.cardtype;
+  setCardType(cardType);
+  updateccNumber(cardNumberMasked.value);
+});
+
+function updateccNumber(cardNumber) {
+  const ccNumber = document.querySelector(".cc-number");
+  ccNumber.innerText =
+    cardNumber.length === 0 ? "1234 5678 9012 3456" : cardNumber;
+}
+
+cardHolderMasked.on("accept", () => {
+  updateCardHolder(cardHolderMasked.value);
+});
+
+function updateCardHolder(name) {
+  const ccHolder = document.querySelector(".cc-info .cc-holder .value");
+
+  ccHolder.innerText = name.length === 0 ? "FULANO DA SILVA" : name;
+}
+
+securityCodeMasked.on("accept", () => {
+  updateSecurityCode(securityCodeMasked.value);
+});
+
+function updateSecurityCode(code) {
+  const ccSecurity = document.querySelector(".cc-security .value");
+  ccSecurity.innerText = code.length === 0 ? "123" : code;
+}
+
+expirationDateMasked.on("accept", () => {
+  updateExpirationDate(expirationDateMasked.value);
+});
+
+function updateExpirationDate(date) {
+  const ccExpiration = document.querySelector(".cc-expiration .value");
+  ccExpiration.innerText = date.length === 0 ? "02/32" : date;
+}

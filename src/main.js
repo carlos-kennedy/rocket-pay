@@ -81,7 +81,9 @@ const cardHolderPattern = {
 const cardHolderMasked = IMask(cardHolder, cardHolderPattern)
 
 const btn = document.querySelector("#btn-add-cc")
-btn.addEventListener("click", () => {})
+btn.addEventListener("click", () => {
+  alert("Seu cartão foi cadastrado com sucesso! 😁")
+})
 
 document.querySelector("form").addEventListener("click", (event) => {
   event.preventDefault()
